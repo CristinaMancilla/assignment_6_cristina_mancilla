@@ -1,0 +1,112 @@
+---
+title: "Exploring the association between political affiliation and self-identification as an 'Environmentalist' "
+author: "Cristina Mancilla"
+date: "11/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE,warning = FALSE )
+
+#attach necessary packages
+
+library(here)
+library(tidyverse)
+library(janitor)
+library(broom)
+library(dplyr)
+library(kableExtra)
+
+```
+### Introduction: 
+
+The Andrew Forest Long-Term Ecological Research site published a report led by Chelsea Batavia that recorded survey data for an online panel of 1,331 anonymous, nationwide U.S respondents.Data collection was completed in 2017 and formally published in 2019. I will use information recorded about survey respondents' political affiliation and self-identification as an "Environmentalist" to determine if there is any association between the two identifiers. I will use a Chi-square test (X^2^) to find evidence of association. 
+
+
+
+
+```{r}
+# read in the data! 
+
+conservation <- read_csv(here("data", "conservation_survey.csv"))
+
+#Filter the data so that only variables ENVI_ID and POL_OR are included in the dataframe. 
+
+```
+
+
+```{r}
+#Add a column that bins political party into a binary response of either "conservative" (1-3) or "liberal" (5-7). Exclude all other political affiliations. 
+
+envi_pol <- conservation %>% 
+  select("ENV_ID", "POL_OR") 
+  
+```
+
+
+```{r}
+envi_pol_out <- envi_pol %>% 
+  mutate(POL_OR = case_when(
+    POL_OR %in% c(1, 2, 3) ~ "Conservative", 
+    POL_OR %in% c(5, 6, 7) ~ "Liberal"
+    
+  )) %>% 
+  
+  mutate(ENV_ID = case_when(
+    ENV_ID %in% c(1) ~ "Yes", 
+    ENV_ID %in% c(2) ~ "No", 
+    ENV_ID %in% c(3) ~ "Unsure"
+  )) 
+
+```
+
+
+```{r, include = FALSE}
+#count the occurrences of political affilication and environmentalist identification 
+
+envi_pol_out %>% 
+  count(ENV_ID, POL_OR)
+```
+
+```{r}
+envipol_counts <- envi_pol_out %>% 
+  na.omit(enviipol_counts) %>% # remove NA from contingency table counts 
+  janitor::tabyl(ENV_ID, POL_OR)
+
+# make another version of this table that has the counts AND proportions. 
+
+envipol_proportions <- envipol_counts %>% 
+  janitor::adorn_percentages() %>% 
+  janitor::adorn_pct_formatting(digits = 2) %>% # put it in a percentage format
+  janitor::adorn_ns()  # add actual counts in each cell 
+
+kable(envipol_proportions, 
+  caption =" Association between respondents' political affiliation and self-identification as an 'environmentalist' ") %>% 
+  kable_styling(font_size = 15) %>%
+  kable_material(full_width = FALSE, html_font = "Cambria") # update the table theme
+  
+
+```
+Counts and proportions of respondents who identified as either 'liberal' or 'conservative' and who responded “Yes”, “No” and “Unsure” to the statement “I consider myself an environmentalist.”
+
+```{r}
+
+# convert the contingency table into a format that can be correctly analyzed in a chi-square test. Use column_to_rownames() to move the ENV_ID column into a row name. 
+
+envi_pol_ct_final <- envipol_counts %>% 
+  column_to_rownames(var = "ENV_ID")
+```
+
+### Analysis: Chi-Square test 
+
+
+```{r, include = FALSE}
+envipo_x2 <- chisq.test(envi_pol_ct_final)
+envipo_x2
+
+envipo_tidy <- broom ::tidy(envipo_x2)
+```
+Using Pearson's Chi-square test to test for significance, I found a significant association (p<0.05) between political affiliation and self - identification as an environmentalist ($Chi$^2^( `r envipo_tidy$parameter` ) = `r envipo_tidy$statistic`, *p* = `r envipo_tidy$p.value `). Many respondents who identified as identified as "conservative" did not identify as an "environmentalist" (71.3%). Only 28% of "liberals" also responded "No". Athough the difference is not as drastic, more "liberals" responded "Yes" (56.88%) identifying as an "environmentalist" than "conservatives" (43.12%).  
+
+
+Data citation: Andrews Forest LTER Site and C. Batavia. 2019. Influences on charitable giving for conservation: Online survey data of 1,331 respondents across the US, August 2017 ver 3. Environmental Data Initiative. https://doi.org/10.6073/pasta/926e6270e324a1322a900da14d38b96c
