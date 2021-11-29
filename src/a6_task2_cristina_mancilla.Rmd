@@ -106,7 +106,7 @@ envipo_x2
 
 envipo_tidy <- broom ::tidy(envipo_x2)
 ```
-Using Pearson's Chi-square test to test for significance, I found a significant association (p<0.05) between political affiliation and self - identification as an environmentalist ($Chi$^2^( `r envipo_tidy$parameter` ) = `r envipo_tidy$statistic`, *p* = `r envipo_tidy$p.value `). Many respondents who identified as identified as "conservative" did not identify as an "environmentalist" (71.3%). Only 28% of "liberals" also responded "No". Athough the difference is not as drastic, more "liberals" responded "Yes" (56.88%) identifying as an "environmentalist" than "conservatives" (43.12%).  
+Using Pearson's Chi-square test to test for significance, I found a significant association (p<0.05) between political affiliation and self - identification as an environmentalist ($Chi$^2^( `r envipo_tidy$parameter` ) = `r envipo_tidy$statistic`, *p* = `r envipo_tidy$p.value `). Many respondents who identified as "conservative" did not identify as an "environmentalist" (71.3%). In comparison, only 28% of "liberals" also responded "No". Although the difference is not as drastic, more "liberals" responded "Yes" (56.88%) to identifying as an "environmentalist" than "conservatives" (43.12%).   
 
 
 Data citation: Andrews Forest LTER Site and C. Batavia. 2019. Influences on charitable giving for conservation: Online survey data of 1,331 respondents across the US, August 2017 ver 3. Environmental Data Initiative. https://doi.org/10.6073/pasta/926e6270e324a1322a900da14d38b96c

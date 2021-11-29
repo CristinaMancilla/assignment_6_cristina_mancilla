@@ -1,0 +1,104 @@
+---
+title: "a6_task3_cristina_mancilla"
+author: "Cristina Mancilla"
+date: "11/28/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#install necessary packages
+
+library(tidyverse)
+library(here)
+library(janitor)
+library(broom)
+library(dplyr)
+library(kableExtra)
+```
+
+
+```{r}
+lizard <- read_csv(here("data", "lizards.csv"))
+```
+
+
+```{r}
+# select columns sex, total_length, and spp (species) and filter for observation of only CNUN (Cnemidophorus uniparens, the Desert Grassland lizard) and CNTE (Cnemidophorus tessalatus, the Colorado Checkered lizard).
+
+
+lizard_fix <- lizard %>% 
+  select("sex", "total_length", "spp") %>% 
+  filter(spp %in% c("CNUN", "CNTE")) %>% 
+  filter(sex =="F") %>% 
+  drop_na()
+
+  
+```
+
+
+
+```{r}
+mu <- ddply(lizard_fix, "spp", summarise, grp.mean=mean(total_length))
+head(mu)
+```
+
+
+```{r}
+# create a visualization comparing total length for female CNTE and CNUN lizards 
+
+ggplot(data = lizard_fix, aes(x= total_length, color = spp)) +
+  geom_histogram(bins= 15,color = "white") +
+  aes(color = spp, fill = spp) +
+  
+  # add a line dipicting mean for each group 
+  geom_vline(data=mu, aes(xintercept=grp.mean, color=spp), 
+             linetype="dashed") + 
+  
+# add labels 
+  
+  labs( x = "Total length (mm)", 
+        y = "counts",
+        title = "Total length (mm) of female Cnemidophorus uniparens (CNUN)\n and Cnemidophorus tessalatus (CNTE) lizards", 
+        caption = "Comparison of the total length (mm), from snout to end of tail, of female Cnemidophorous uniparens \n (Desert Grassland Lizard) and Cnemidophorus tessalatus (Colorado Checkered Lizard).Dashed lines \n represent mean total length (mm) for each species of lizard.The mean for C.uniparens (CNUN) is 147 mm \n and C.tessalatus (CNTE) is 245 (mm) Lizards were sampled using pitfall traps near the San Andres National \n Wildlife Refuge.") +
+  
+#customize title 
+  
+theme(plot.title = element_text(color = "midnightblue", size = 14, face = "bold"),  
+      plot.caption = element_text(hjust = 0, size = 10)
+  )
+  
+  
+         
+```
+```{r}
+lizards_summarize <-lizard_fix %>% 
+  
+  group_by(spp)%>% #group by species
+  
+  summarize(mean_mm = round(mean(total_length), 1), 
+          sd_mm = round(sd(total_length), 1), 
+          median_mm = round(median(total_length), 1), 
+          n = n()) %>% 
+  
+#use Kble to add a table caption and update the theme and style of the table so that it looks presentable when it is knitted. 
+  
+  kbl(caption ="Summary statistics for total length of female C.uniparens (CNUN) and C. tessalatus (CNTE) " ) %>% 
+  
+kable_classic(full_width = F, html_font = "Cambria") #this is the theme of the table 
+
+  lizards_summarize
+ #call the object back to view the table 
+```
+```
+
+
+
+
+
+         
+```
+Data source: Lightfoot, D. 2017. Lizard pitfall trap data (LTER-II, LTER-III) ver 36. Environmental Data Initiative. https://doi.org/10.6073/pasta/ff37b4cace16a9943575f3fd7067064e
