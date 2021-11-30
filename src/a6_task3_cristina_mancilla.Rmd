@@ -1,12 +1,12 @@
 ---
-title: "a6_task3_cristina_mancilla"
+title: "Comparing total lengths of female Cnemidophorus uniparens and Cnemidophorus tessalatus"
 author: "Cristina Mancilla"
 date: "11/28/2021"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
 ```{r}
@@ -18,8 +18,13 @@ library(janitor)
 library(broom)
 library(dplyr)
 library(kableExtra)
+library(equatiomatic)
+
 ```
 
+## Introduction 
+
+The Cnemidophorus uniparens, also known as the Desert Grassland lizard and Cnemidophorus tessalatus, or the Colorado Checkered lizard, can both be found in the southwestern United States. I will compare the total lengths (from snout to tail) of the two species from data collected near the San Andres National Wildlife Refuge by David Lightfoot in 2017. I will questions: "Is there a significant difference between total lenghts between C.tessalatus and C. uniparens?" using an unpaired, two-sample t-test. Only data for female lizards will be included because C.uniparens is an all-female species.
 
 ```{r}
 lizard <- read_csv(here("data", "lizards.csv"))
@@ -45,13 +50,13 @@ lizard_fix <- lizard %>%
 mu <- ddply(lizard_fix, "spp", summarise, grp.mean=mean(total_length))
 head(mu)
 ```
-
+## Analysis 
 
 ```{r}
 # create a visualization comparing total length for female CNTE and CNUN lizards 
 
 ggplot(data = lizard_fix, aes(x= total_length, color = spp)) +
-  geom_histogram(bins= 15,color = "white") +
+  geom_histogram(bins= 20,color = "white") +
   aes(color = spp, fill = spp) +
   
   # add a line dipicting mean for each group 
@@ -93,11 +98,44 @@ kable_classic(full_width = F, html_font = "Cambria") #this is the theme of the t
   lizards_summarize
  #call the object back to view the table 
 ```
+The mean length of C.uniparens (CNUN) is 244.9 (mm) ± 47.3 and the mean total length for C. tessalatus (CNTE) is 147.6 (mm) ± 34.6. It's important to note that there are more observations for CNUN (40) than CNTE (28). 
+
+ 
+```{r}
+#create subsets to use for t-tests and exploratory plots
+
+cnte <- lizard_fix %>% 
+  filter(spp=="CNTE") %>% 
+  pull(total_length) 
+
+
+cnun <- lizard_fix %>% 
+  filter(spp=="CNUN") %>% 
+  pull(total_length)
 ```
 
 
+```{r, include = FALSE}
+#visualize the data using histograms to check for normality - appropriate for t-test? Both subsets look normally distributed, so the t-test assumption of normal distribution is accurate and a t-test is appropriate. 
+
+hist(cnte)
+hist(cnun)
+```
 
 
+```{r, include = FALSE}
+# t-test! 
+
+lizard_ttest <- t.test(cnte,cnun,na.rm=T)
+```
+
+```{r, include = FALSE}
+# cohen's D  for effect size 
+
+lizard_cohen <- effsize::cohen.d(cnte, cnun,na.rm=T)
+```
+
+There is a significant difference between total lengths (mm) of female C.uniparens (CNUN) and C. tessalatus (CNTE) (Welch's two-sample, unpaired t-test: t(`r lizard_ttest$statistic`), p = `r lizard_ttest$p.value`) (p<0.05) . The absolute difference in means between the two species is 97.3 (mm).The effect size is large with a difference of (Cohen's d = `r lizard_cohen$estimate`) standard deviations between the species total lengths. Data is normally distributed for both groups.  
 
          
 ```
