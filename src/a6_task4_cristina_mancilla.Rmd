@@ -1,0 +1,57 @@
+---
+title: "a6_t4_cristina_mancilla"
+author: "Cristina Mancilla"
+date: "11/29/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(here)
+library(tidyverse)
+library(dplyr)
+library(janitor)
+library(paletteer)
+library(ggthemes)
+```
+
+```{r}
+mono_lake <- read_csv(here("data", "mono_lake_annual_levels.csv"), skip = 5) %>% 
+  clean_names() %>% 
+  select("year", "lake_level_feet_above_sea_level")
+
+```
+
+```{r}
+ggplot(data = mono_lake, aes(y = lake_level_feet_above_sea_level, x = year))+
+  geom_line(color = "navyblue")+
+  labs(y= "Lake level in feet above sea level", 
+       x= "Year", 
+       title = "History of Mono Lake levels (ft)", 
+       subtitle= "Change in lake levels in feet above sea level from 1850 - 2017", 
+       caption = "Change in Mono Lake levels in feet above sea level from 1850-2017. 1941 marks the year that the Los Angeles\n Department of Water & Power (DWP) began diverting water from Mono Lake’s tributary streams. \n The decreasing lake levels resulted in the formation of a land bridge around 6,377 feet above sea level. \n The formation of this bridge decreased water bird populations because predators gained accessibility to \n previously protected nesting sites. Decreased water levels also impacted salinity levels which reduced \n waterbird prey and added further stress to the populations. In 1980, water began flowing \n into Mono Lake once again because of student and community led advocacy efforts. \n 
+
+Data from: the Mono Basin Clearninghouse, Mono Lake Committee")+
+  
+  theme(plot.title = element_text(color = "midnightblue", size = 15, face = "bold"),  
+      plot.caption = element_text(hjust = 0, size = 10), 
+      plot.subtitle = element_text(color = "darkslategrey", size = 13)) +
+  
+  annotate( # this makes the little arrow with line 
+    geom = "curve", x = 1940, y = 6417, xend = 1955, yend = 6419, 
+    curvature = .3, arrow = arrow(length = unit(2, "mm"))) +
+  
+   annotate(geom = "text", x = 1955, y = 6419.00, label = "DPW water divergence", hjust = "left", size = 3) +
+  
+  annotate( # this makes the little arrow with line 
+    geom = "curve", x = 1983, y = 6377, xend = 1990, yend =6385 , 
+    curvature = .3, arrow = arrow(length = unit(2, "mm"))) +
+  
+  annotate(geom = "text", x = 1983, y = 6388.00, label = "Land bridge formation", hjust = "left", size = 3)
+  
+
+```
+
