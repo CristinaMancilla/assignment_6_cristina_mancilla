@@ -1,5 +1,5 @@
 ---
-title: "a6_t4_cristina_mancilla"
+title: "History of Mono Lake levels in feet above sea level"
 author: "Cristina Mancilla"
 date: "11/29/2021"
 output: html_document
@@ -33,12 +33,17 @@ ggplot(data = mono_lake, aes(y = lake_level_feet_above_sea_level, x = year))+
        title = "History of Mono Lake levels (ft)", 
        subtitle= "Change in lake levels in feet above sea level from 1850 - 2017", 
        caption = "Change in Mono Lake levels in feet above sea level from 1850-2017. 1941 marks the year that the Los Angeles\n Department of Water & Power (DWP) began diverting water from Mono Lake’s tributary streams. \n The decreasing lake levels resulted in the formation of a land bridge around 6,377 feet above sea level. \n The formation of this bridge decreased water bird populations because predators gained accessibility to \n previously protected nesting sites. Decreased water levels also impacted salinity levels which reduced \n waterbird prey and added further stress to the populations. In 1980, water began flowing \n into Mono Lake once again because of student and community led advocacy efforts. \n 
+Mono Lake is home to the Kootzaduka’a (or Kutzadika’a) Tribe. 
 
 Data from: the Mono Basin Clearninghouse, Mono Lake Committee")+
   
+  theme_light()+
+  
   theme(plot.title = element_text(color = "midnightblue", size = 15, face = "bold"),  
       plot.caption = element_text(hjust = 0, size = 10), 
-      plot.subtitle = element_text(color = "darkslategrey", size = 13)) +
+      plot.subtitle = element_text(color = "darkslategrey", size = 13), 
+      plot.background = element_rect(fill = "azure2")) +
+  
   
   annotate( # this makes the little arrow with line 
     geom = "curve", x = 1940, y = 6417, xend = 1955, yend = 6419, 
